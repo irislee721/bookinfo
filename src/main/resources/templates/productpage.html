@@ -1,33 +1,28 @@
-{% extends "bootstrap/base.html" %}
-{% block metas %}
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-{% endblock %}
-
-{% block styles %}
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 
 <!-- Optional theme -->
-<link rel="stylesheet" href="static/bootstrap/css/bootstrap-theme.min.css">
-{% endblock %}
-{% block scripts %}
-<!-- Latest compiled and minified JavaScript -->
-<script src="static/jquery.min.js"></script>
+<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
 
 <!-- Latest compiled and minified JavaScript -->
-<script src="static/bootstrap/js/bootstrap.min.js"></script>
+<script src="jquery.min.js"></script>
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="bootstrap/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
   $('#login-modal').on('shown.bs.modal', function () {
     $('#username').focus();
   });
 </script>
-{% endblock %}
-{% block title %}Simple Bookstore App{% endblock %}
-{% block content %}
-
+</head>
+<body>
 <nav class="navbar navbar-inverse navbar-static-top">
   <div class="container">
     <div class="navbar-header">
@@ -79,8 +74,8 @@
       </div>
       <div class="modal-body">
         <form method="post" action='login' name="login_form">
-          <p><input type="text" class="form-control" name="username" id="username" placeholder="User Name"></p>
-          <p><input type="password" class="form-control" name="passwd" placeholder="Password"></p>
+          <p><input type="text" class="form-control" name="username" id="username" placeholder="User Name"/></p>
+          <p><input type="password" class="form-control" name="passwd" placeholder="Password"/></p>
           <p>
             <button type="submit" class="btn btn-primary">Sign in</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -156,4 +151,5 @@
     </div>
   </div>
 </div>
-{% endblock %}
+</body>
+</html>

@@ -6,16 +6,17 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 
-@RestController
-public class DetailsController {
+import javax.servlet.http.HttpSession;
+
+@Controller
+public class ProductpageController {
 
 	private final static String[] headers_to_propagate = {
 			// All applications should propagate x-request-id. This header is
@@ -63,7 +64,7 @@ public class DetailsController {
 //	private final static String ratings_service = "http://" + ratings_hostname + services_domain + ":9080";///ratings";
 //	private final static String reviews_service = "http://" + reviews_hostname + services_domain + ":9080";///reviews";
 //	private final static String productpage_service = "http://" + ratings_hostname + services_domain + ":9080";///details";
-	
+
 	private static Map<String, Object> detailsMap;
 	static {
 		detailsMap = new LinkedHashMap<String, Object>();
@@ -99,40 +100,30 @@ public class DetailsController {
 		service_dict.put("details", detailsMap);
 		service_dict.put("reviews", reviewsMap);
 	}
-			
+
 	public static void main(String[] args) {
 		Gson gson = new Gson();
 		StringBuilder htmlBuilder = new StringBuilder();
 		htmlBuilder.append("<table class=\"table table-condensed table-bordered table-hover\">");
-		
+
 
 	}
-	
+
 	Gson gson = new Gson();
-	
+
 	public void trace() {
 
 	}
 	public void getForwardHeaders() {
-		
+
 	}
-	
-//	@RequestMapping(value = {"/test", "/index.html"}, method = RequestMethod.GET)
-//	public String index(Model model) {
-//		String table = "<table class=\\\"table table-condensed table-bordered table-hover\\\"><tr><th>name</th><td>http://details:9080</td></tr><tr><th>endpoint</th><td>details</td></tr><tr><th>children</th><td><table class=\\\"table table-condensed table-bordered table-hover\\\"><tr><th>name</th><th>endpoint</th><th>children</th></tr><tr><td>http://details:9080</td><td>details</td><td></td></tr><tr><td>http://reviews:9080</td><td>reviews</td><td><table class=\\\"table table-condensed table-bordered table-hover\\\"><tr><th>name</th><th>endpoint</th><th>children</th></tr><tr><td>http://ratings:9080</td><td>ratings</td><td></td></tr></table></td></tr></table></td></tr></table>";
-//		model.addAttribute("serviceTable", table);
-//		model.addAttribute("name", "www");
-//		return "templates/index";
-//	}
+
 	@RequestMapping(value = {"/", "/index.html"}, method = RequestMethod.GET)
-	public ModelAndView  index() {
+	public String  index(Model model) {
 		String table = "<table class=\"table table-condensed table-bordered table-hover\"><tr><th>name</th><td>http://details:9080</td></tr><tr><th>endpoint</th><td>details</td></tr><tr><th>children</th><td><table class=\"table table-condensed table-bordered table-hover\"><tr><th>name</th><th>endpoint</th><th>children</th></tr><tr><td>http://details:9080</td><td>details</td><td></td></tr><tr><td>http://reviews:9080</td><td>reviews</td><td><table class=\"table table-condensed table-bordered table-hover\"><tr><th>name</th><th>endpoint</th><th>children</th></tr><tr><td>http://ratings:9080</td><td>ratings</td><td></td></tr></table></td></tr></table></td></tr></table>";
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("index");
-		mav.addObject("name", "www");
-		mav.addObject("serviceTable", table);
-		
-		return mav;
+		model.addAttribute("name", "www");
+		model.addAttribute("serviceTable", table);
+		return "index";
 	}
 	
 	@RequestMapping(value = "/health", method = RequestMethod.GET)
@@ -141,13 +132,19 @@ public class DetailsController {
 	}
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public void login() {
-		
+	public ModelAndView login(@RequestParam String username, HttpSession session) {
+		session.setAttribute("user", username);
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("productpage");
+		return mav;
 	}
 	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
-	public void logout() {
-		
+	public ModelAndView logout(HttpSession session) {
+		session.invalidate();
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("productpage");
+		return mav;
 	}
 	
 //	async
@@ -165,27 +162,11 @@ public class DetailsController {
 		
 	}
 	
-	@RequestMapping(value = "/productpage")
-	public void front() {
-		
-	}
-	@RequestMapping(value = "/api/v1/products")
-	public void productsRoute() {
-		
-	}
-	@RequestMapping(value = "/api/v1/products/{productId}")
-	public void productRoute(@PathVariable("productId") int productId) {
-		
-	}
-	
-	@RequestMapping(value = "/api/v1/products/{productId}/reviews")
-	public void reviewsRoute(@PathVariable("productId") int productId) {
-		
-	}
-
-	@RequestMapping(value = "/api/v1/products/{productId}/ratings")
-	public void ratingsRoute(@PathVariable("productId") int productId) {
-		
+	@RequestMapping(value = "/productpage", method = RequestMethod.GET)
+	public String front() {
+//		ModelAndView mav = new ModelAndView();
+//		mav.setViewName("productpage");
+		return "productpage";
 	}
 	
 //	Data providers
@@ -196,7 +177,6 @@ public class DetailsController {
 		map.put("title", "The Comedy of Errors");
 		map.put("descriptionHtml", "<a href=\"https://en.wikipedia.org/wiki/The_Comedy_of_Errors\">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare\\'s</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.");
 		productList.add(map);
-//		String json = new Gson().toJson(productList);
 		return productList;
 		
 	}
