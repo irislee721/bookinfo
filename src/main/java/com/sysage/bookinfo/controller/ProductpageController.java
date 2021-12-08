@@ -3,8 +3,10 @@ package com.sysage.bookinfo.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,12 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
+import com.sysage.bookinfo.vo.DetailsVO;
+import com.sysage.bookinfo.vo.ProductVO;
+import com.sysage.bookinfo.vo.ReviewsDetailVO;
+import com.sysage.bookinfo.vo.ReviewsVO;
 
 import javax.servlet.http.HttpSession;
 
 @Controller
 public class ProductpageController {
-
+	
 	private final static String[] headers_to_propagate = {
 			// All applications should propagate x-request-id. This header is
 			// included in access log statements and is used for consistent trace
@@ -101,14 +107,9 @@ public class ProductpageController {
 		service_dict.put("reviews", reviewsMap);
 	}
 
-	public static void main(String[] args) {
-		Gson gson = new Gson();
-		StringBuilder htmlBuilder = new StringBuilder();
-		htmlBuilder.append("<table class=\"table table-condensed table-bordered table-hover\">");
-
-
-	}
-
+	@Autowired
+	Details details;
+	
 	Gson gson = new Gson();
 
 	public void trace() {
@@ -134,16 +135,18 @@ public class ProductpageController {
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ModelAndView login(@RequestParam String username, HttpSession session) {
 		session.setAttribute("user", username);
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("productpage");
+		ModelAndView mav = new ModelAndView("redirect:/productpage");
+//		ModelAndView mav = new ModelAndView();
+//		mav.setViewName("productpage");
 		return mav;
 	}
 	
 	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public ModelAndView logout(HttpSession session) {
 		session.invalidate();
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("productpage");
+		ModelAndView mav = new ModelAndView("redirect:/productpage");
+//		ModelAndView mav = new ModelAndView();
+//		mav.setViewName("productpage");
 		return mav;
 	}
 	
@@ -163,35 +166,38 @@ public class ProductpageController {
 	}
 	
 	@RequestMapping(value = "/productpage", method = RequestMethod.GET)
-	public String front() {
+	public String front(Model model) {
+		try {
+			int prodId = 0; // TODO: replace default value
+			ProductVO product = details.getProduct(prodId);
+			model.addAttribute("product", product);
+			
+			DetailsVO productdetails = details.getProductDetails(prodId);
+			model.addAttribute("details", productdetails);
+			
+			ReviewsVO reviews = details.getProductReviews(prodId);
+			List<ReviewsDetailVO> list = reviews.getReviews();
+//			list.get(0).setRating(null);
+//			model.addAttribute("review", reviews.getReviews());
+			
+			model.addAttribute("review", reviews.getReviews());
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			model.addAttribute("error", "Sorry, product details are currently unavailable for this book.");
+		}
+		
+		
+		
 //		ModelAndView mav = new ModelAndView();
 //		mav.setViewName("productpage");
+		model.addAttribute("", "");
+		
+		
+		
 		return "productpage";
 	}
 	
-//	Data providers
-	public ArrayList<Map<String, String>> getProducts() {
-		ArrayList<Map<String, String>> productList= new ArrayList<Map<String, String>>();
-		Map<String, String> map = new LinkedHashMap<String, String>();
-		map.put("id", "0");
-		map.put("title", "The Comedy of Errors");
-		map.put("descriptionHtml", "<a href=\"https://en.wikipedia.org/wiki/The_Comedy_of_Errors\">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare\\'s</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.");
-		productList.add(map);
-		return productList;
-		
-	}
-//	public String getProducts() {
-//		ProductVO product = new ProductVO();
-//		product.setId("0");
-//		product.setTitle("The Comedy of Errors");
-//		product.setDescriptionHtml("<a href=\\\"https://en.wikipedia.org/wiki/The_Comedy_of_Errors\\\">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare\\\\'s</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.");
-//	
-//		return gson.toJson(product);
-//	}
-	
-	public void getProduct(int productId) {
-		
-	}
 	
 	public void getProductDetails(int productId, HttpHeaders headers) {
 		

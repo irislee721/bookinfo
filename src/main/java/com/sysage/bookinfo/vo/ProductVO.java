@@ -2,14 +2,14 @@ package com.sysage.bookinfo.vo;
 
 public class ProductVO {
 
-	private String id;
+	private int id;
 	private String title;
 	private String descriptionHtml;
 	
-	public String getId() {
+	public int getId() {
 		return id;
 	}
-	public void setId(String id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getTitle() {
