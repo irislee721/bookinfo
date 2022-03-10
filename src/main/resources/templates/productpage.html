@@ -90,8 +90,8 @@
       <blockquote th:each="review : ${review}" >
         <p th:text="${review.text}"></p>
         <small th:text="${review.reviewer}"></small>
-        <font th:if="review.rating!=null and review.rating.color!=null" th:color="${review.rating.color}">
-          <span th:each="i: ${#numbers.sequence(1, (review.rating.stars))}" class="glyphicon glyphicon-star"></span><span th:if="${review.rating.stars} != 5" th:each="i: ${#numbers.sequence(1, 5-(review.rating.stars))}" class="glyphicon glyphicon-star-empty"></span>
+        <font th:if="${review.rating != null and review.rating.color != null}" th:color="${review.rating.color}">
+          <span th:each="i: ${#numbers.sequence(1, (review.rating.stars)) }" class="glyphicon glyphicon-star"></span><span th:if="${review.rating.stars} != 5" th:each="i: ${#numbers.sequence(1, 5-(review.rating.stars))}" class="glyphicon glyphicon-star-empty"></span>
         </font>
       </blockquote>
     </div>

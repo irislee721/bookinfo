@@ -62,55 +62,8 @@ public class ProductpageController {
 			// Application-specific headers to forward.
 			"end-user", "user-agent", };
 
-	private final static String services_domain = System.getenv("SERVICES_DOMAIN") == null ? "" : ("." + System.getenv("SERVICES_DOMAIN"));
-	private final static String ratings_hostname = System.getenv("RATINGS_HOSTNAME") == null ? "ratings" : System.getenv("RATINGS_HOSTNAME");
-	private final static String details_hostname = System.getenv("DETAILS_HOSTNAME") == null ? "details" : System.getenv("DETAILS_HOSTNAME");
-	private final static String reviews_hostname = System.getenv("REVIEWS_HOSTNAME") == null ? "reviews" : System.getenv("REVIEWS_HOSTNAME");
-//	private final static String details_service = "http://" + details_hostname + services_domain + ":9080";///details";
-//	private final static String ratings_service = "http://" + ratings_hostname + services_domain + ":9080";///ratings";
-//	private final static String reviews_service = "http://" + reviews_hostname + services_domain + ":9080";///reviews";
-//	private final static String productpage_service = "http://" + ratings_hostname + services_domain + ":9080";///details";
-
-	private static Map<String, Object> detailsMap;
-	static {
-		detailsMap = new LinkedHashMap<String, Object>();
-		detailsMap.put("name", "http://" + details_hostname + services_domain + ":9080");
-		detailsMap.put("endpoint", "details");
-		detailsMap.put("children", new ArrayList<Object>());
-	}
-	private static Map<String, Object> ratingsMap;
-	static {
-		ratingsMap = new LinkedHashMap<String, Object>();
-		ratingsMap.put("name", "http://" + ratings_hostname + services_domain + ":9080");
-		ratingsMap.put("endpoint", "ratings");
-		ratingsMap.put("children", new ArrayList<Object>());
-	}
-	private static Map<String, Object> reviewsMap;
-	static {
-		reviewsMap = new LinkedHashMap<String, Object>();
-		reviewsMap.put("name", "http://" + reviews_hostname + services_domain + ":9080");
-		reviewsMap.put("endpoint", "reviews");
-		reviewsMap.put("children", new ArrayList<Object>(Arrays.asList(ratingsMap)));
-	}
-	private static Map<String, Object> productpageMap;
-	static {
-		productpageMap = new LinkedHashMap<String, Object>();
-		productpageMap.put("name", "http://" + details_hostname + services_domain + ":9080");
-		productpageMap.put("endpoint", "details");
-		productpageMap.put("children", new ArrayList<Object>(Arrays.asList(detailsMap, reviewsMap)));
-	}
-	private static Map<String, Object> service_dict;
-	static {
-		service_dict = new LinkedHashMap<String, Object>();
-		service_dict.put("productpage", productpageMap);
-		service_dict.put("details", detailsMap);
-		service_dict.put("reviews", reviewsMap);
-	}
-
 	@Autowired
 	Details details;
-	
-	Gson gson = new Gson();
 
 	public void trace() {
 
@@ -136,8 +89,6 @@ public class ProductpageController {
 	public ModelAndView login(@RequestParam String username, HttpSession session) {
 		session.setAttribute("user", username);
 		ModelAndView mav = new ModelAndView("redirect:/productpage");
-//		ModelAndView mav = new ModelAndView();
-//		mav.setViewName("productpage");
 		return mav;
 	}
 	
@@ -145,8 +96,6 @@ public class ProductpageController {
 	public ModelAndView logout(HttpSession session) {
 		session.invalidate();
 		ModelAndView mav = new ModelAndView("redirect:/productpage");
-//		ModelAndView mav = new ModelAndView();
-//		mav.setViewName("productpage");
 		return mav;
 	}
 	
@@ -177,24 +126,15 @@ public class ProductpageController {
 			
 			ReviewsVO reviews = details.getProductReviews(prodId);
 			List<ReviewsDetailVO> list = reviews.getReviews();
-//			list.get(0).setRating(null);
-//			model.addAttribute("review", reviews.getReviews());
 			
 			model.addAttribute("review", reviews.getReviews());
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			model.addAttribute("error", "Sorry, product details are currently unavailable for this book.");
 		}
-		
-		
-		
-//		ModelAndView mav = new ModelAndView();
-//		mav.setViewName("productpage");
+
 		model.addAttribute("", "");
-		
-		
-		
+
 		return "productpage";
 	}
 	
@@ -210,18 +150,5 @@ public class ProductpageController {
 	public void getProductRatings(int productId, HttpHeaders headers) {
 		
 	}
-
-	
-//	class Writer(object):
-//	    def __init__(self, filename):
-//	        self.file = open(filename, 'w')
-//
-//	    def write(self, data):
-//	        self.file.write(data)
-//
-//	    def flush(self):
-//	        self.file.flush()
-	
-
 
 }

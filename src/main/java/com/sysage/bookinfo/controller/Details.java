@@ -1,6 +1,7 @@
 package com.sysage.bookinfo.controller;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.apache.http.Header;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,9 @@ import com.sysage.bookinfo.vo.ReviewsVO;
 
 @Component
 public class Details {
-	
-	Gson gson = new Gson();
-	private final static String star_color = System.getenv("STAR_COLOR") == null ? "black" : System.getenv("STAR_COLOR");
+
+	private final static Boolean ratings_enabled = Boolean.valueOf(System.getenv("ENABLE_RATINGS"));
+	private final static String star_color = Optional.ofNullable(System.getenv("STAR_COLOR")).orElse("black");
 	
 	//	front call getProduct
 	public ProductVO getProduct(int productId) {
@@ -27,7 +28,6 @@ public class Details {
 			return null;
 		} else {
 			//判斷list get出來的物件id是否=productId?
-			//productList.get(productId).getId().equals(productId)
 			return productList.get(productId);
 		}
 	}
@@ -44,10 +44,9 @@ public class Details {
 		productList.add(product);
 		return productList;
 	}
-	
-	
-//	call DB
-//	front call getProductDetails
+
+	//	call DB
+	//	front call getProductDetails
 	public DetailsVO getProductDetails(int productId) throws Exception{
 		DetailsVO detailsVO = new DetailsVO();
 		detailsVO.setId(productId);
@@ -59,37 +58,39 @@ public class Details {
 		detailsVO.setLanguage("English");
 		detailsVO.setISBN_10("1234567890");
 		detailsVO.setISBN_13("123-1234567890");
-//		return gson.toJson(detailsVO);
 		return detailsVO;
 	}
 	
 	//ratings and reviews放在一起了
 	public ReviewsVO getProductReviews(int productId) {
-		
-		ReviewsVO reviewsVO = new ReviewsVO();
-		ReviewsDetailVO reviewsDetail1 = new ReviewsDetailVO();
-		ReviewsDetailVO reviewsDetail2 = new ReviewsDetailVO();
-		RatingVO ratingVO1 = new RatingVO();
-		RatingVO ratingVO2 = new RatingVO();
+		ReviewsVO reviews = new ReviewsVO();
+		ReviewsDetailVO reviewsDetail = new ReviewsDetailVO();
 
-		ratingVO1.setStars(5);
-		ratingVO1.setColor(star_color);
-		reviewsDetail1.setReviewer("Reviewer1");
-		reviewsDetail1.setText("An extremely entertaining play by Shakespeare. The slapstick humour is refreshing!");
-		reviewsDetail1.setRating(ratingVO1);
+		reviews.setId(productId);
+		reviewsDetail.setReviewer("Reviewer1");
+		reviewsDetail.setText("An extremely entertaining play by Shakespeare. The slapstick humour is refreshing!");
+
+		if (ratings_enabled) {
+			RatingVO rating = new RatingVO();
+			rating.setStars(5);
+			rating.setColor(star_color);
+			reviewsDetail.setRating(rating);
+		}
+		reviews.addReviews(reviewsDetail);
+
+		reviewsDetail = new ReviewsDetailVO();
+		reviewsDetail.setReviewer("Reviewer2");
+		reviewsDetail.setText("Absolutely fun and entertaining. The play lacks thematic depth when compared to other plays by Shakespeare.");
+
+		if (ratings_enabled) {
+			RatingVO rating = new RatingVO();
+			rating.setStars(4);
+			rating.setColor(star_color);
+			reviewsDetail.setRating(rating);
+		}
+		reviews.addReviews(reviewsDetail);
 		
-		ratingVO2.setStars(4);
-		ratingVO2.setColor(star_color);
-		reviewsDetail2.setReviewer("Reviewer2");
-		reviewsDetail2.setText("Absolutely fun and entertaining. The play lacks thematic depth when compared to other plays by Shakespeare.");
-		reviewsDetail2.setRating(ratingVO2);
-		
-		reviewsVO.setId(productId);
-		reviewsVO.addReviews(reviewsDetail1);
-		reviewsVO.addReviews(reviewsDetail2);
-		
-		return reviewsVO;
+		return reviews;
 	}
 	
-
 }
