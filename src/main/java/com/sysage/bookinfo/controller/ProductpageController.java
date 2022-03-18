@@ -1,10 +1,9 @@
 package com.sysage.bookinfo.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.gson.Gson;
 import com.sysage.bookinfo.vo.DetailsVO;
 import com.sysage.bookinfo.vo.ProductVO;
 import com.sysage.bookinfo.vo.ReviewsDetailVO;
@@ -62,6 +60,8 @@ public class ProductpageController {
 			// Application-specific headers to forward.
 			"end-user", "user-agent", };
 
+	private final static int MAX_FAIL_COUNT = Integer.valueOf(Optional.ofNullable(System.getenv("FAIL_COUNT")).orElse("5"));
+
 	@Autowired
 	Details details;
 
@@ -109,15 +109,14 @@ public class ProductpageController {
 		
 	}
 	
-	
 	public void floodReviews() {
 		
 	}
 	
 	@RequestMapping(value = "/productpage", method = RequestMethod.GET)
-	public String front(Model model) {
+	public String front(Model model, HttpSession session) {
+		int prodId = 0; // TODO: replace default value
 		try {
-			int prodId = 0; // TODO: replace default value
 			ProductVO product = details.getProduct(prodId);
 			model.addAttribute("product", product);
 			
@@ -135,10 +134,29 @@ public class ProductpageController {
 
 		model.addAttribute("", "");
 
+		if(session.getAttribute("user") != null) {
+			int fail_count = (Integer) Optional.ofNullable(session.getAttribute("fail_count")).orElse(0);
+			session.setAttribute("fail_count", fail_count + 1);
+			checkFailCount(prodId, MAX_FAIL_COUNT, session);
+		}
+
 		return "productpage";
 	}
 	
-	
+	public void checkFailCount(int productId, int maxFailCount, HttpSession session) {
+		int countDown = maxFailCount - (Integer) session.getAttribute("fail_count");
+		Logger.getLogger(ProductpageController.class.getName()).info("Fail count down: " + countDown);
+
+		// begin oom task
+		if (countDown == 0) {
+			session.setAttribute("fail_count", 0);
+			List<byte[]> list = new ArrayList<>();
+			while (true) {
+				list.add(new byte[1024 * 1024]);
+			}
+		}
+	}
+
 	public void getProductDetails(int productId, HttpHeaders headers) {
 		
 	}
