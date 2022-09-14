@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: bookinfo
+  name: bookinfo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bookinfo
+  template:
+    metadata:
+      labels:
+        app: bookinfo
+    spec:
+      containers:
+        - image: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/bookinfo:latest
+          imagePullPolicy: Always
+          name: bookinfo
+          ports:
+            - containerPort: 8080
+              protocol: TCP
