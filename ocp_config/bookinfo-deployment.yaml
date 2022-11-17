@@ -15,7 +15,7 @@ spec:
         app: bookinfo
     spec:
       containers:
-        - image: image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/bookinfo:latest
+        - image: quay.redhat.com/admin/bookinfo:latest
           imagePullPolicy: Always
           name: bookinfo
           ports:
