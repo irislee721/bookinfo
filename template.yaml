@@ -1,38 +1,38 @@
 ---
-    apiVersion: apps/v1
-    kind: Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${NAME}
+  namespace: ${NAMESPACE}
+  labels:
+    auth: ${NAME}
+spec:
+  replicas: ${COUNT}
+  selector:
+    matchLabels:
+      auth: ${NAME}
+  template:
     metadata:
-      name: ${NAME}
-      namespace: ${NAMESPACE}
       labels:
         auth: ${NAME}
     spec:
-      replicas: ${COUNT}
-      selector:
-        matchLabels:
-          auth: ${NAME}
-      template:
-        metadata:
-          labels:
-            auth: ${NAME}
-        spec:
-          containers:
-            - name: ${NAME}
-              image: ${IMAGE}
-              imagePullPolicy: "Always"
-              ports:
-                - containerPort: 8080
-    ---
-    kind: Service
-    apiVersion: v1
-    metadata:
-      name:  ${NAME}
-      namespace: ${NAMESPACE}
-    spec:
-      selector:
-        auth:  ${NAME}
-      type:  ClusterIP
-      ports:
-        - name:  http
-          port:  8080
-          targetPort:  8080
+      containers:
+        - name: ${NAME}
+          image: ${IMAGE}
+          imagePullPolicy: "Always"
+          ports:
+            - containerPort: 8080
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  ${NAME}
+  namespace: ${NAMESPACE}
+spec:
+  selector:
+    auth:  ${NAME}
+  type:  ClusterIP
+  ports:
+    - name:  http
+      port:  8080
+      targetPort:  8080
